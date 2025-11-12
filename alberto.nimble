@@ -11,3 +11,4 @@ bin           = @["alberto"]
 # Dependencies
 
 requires "nim >= 2.2.6"
+requires "owlkettle >=3.0.0"

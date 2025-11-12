@@ -4,11 +4,12 @@
 import std/httpclient
 import std/json
 import std/[xmlparser, xmltree]
+import std/unicode
 import owlkettle
 
 
 proc do_search(word: string): string =
-  # search the word
+# search the word
   echo "Searching..."
   if word == "":
     return "Por favor escrever uma palavra."
@@ -17,8 +18,8 @@ proc do_search(word: string): string =
   var client = newHttpClient()
   var jump = false
   try:
-    response = client.getContent("https://api.dicionario-aberto.net/word/" & word)
-    echo response
+    response = client.getContent("https://api.dicionario-aberto.net/word/" & toLower(word))
+    #echo response
     if response == "[]" or response == "":
       definition = "A palavra não está no dicionário"
       jump = true
