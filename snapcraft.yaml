@@ -1,0 +1,69 @@
+name: alberto
+version: "0.1.0"
+summary: A portuguese dictionary for the desktop.
+description: |
+  Portuguese dictionary for the desktop.
+  Dicionário de português para o desktop.
+
+grade: stable
+confinement: strict
+base: core24
+
+apps:
+  alberto:
+    extensions: [gnome]
+    command: bin/alberto
+    plugs: [home, network, desktop]
+
+parts:
+  nim-compiler:
+    plugin: nil
+    source: https://github.com/nim-lang/Nim/archive/refs/tags/v2.2.6.tar.gz # Use latest version
+    source-type: tar
+    build-packages:
+      - build-essential
+      - tar
+      - git
+      - xz-utils
+    override-build: |
+      set -eux
+      cd $SNAPCRAFT_PART_SRC
+      ./build_all.sh
+      ./bin/nim c -d:release koch
+      ./koch boot -d:release
+      ./koch tools
+      mkdir -p $SNAPCRAFT_PART_INSTALL/bin
+      cp -r bin/* $SNAPCRAFT_PART_INSTALL/bin/
+      cp -r lib $SNAPCRAFT_PART_INSTALL/
+      cp -r config $SNAPCRAFT_PART_INSTALL/
+
+  alberto:
+    plugin: nil
+    after:
+      - nim-compiler
+    source: .
+    build-packages:
+      - build-essential
+      - pkg-config
+      - libgtk-4-dev
+    stage-packages:
+      - libc6
+      - libgtk-4-1
+
+    override-build: |
+      set -eux
+
+      # Set up Nim path
+      export PATH=$SNAPCRAFT_STAGE/bin:$PATH
+      export NIM_LIB_PREFIX=$SNAPCRAFT_STAGE/lib
+
+      # Set the PATH so the compiler can find packages installed by nimble
+      export NIMBLE_DIR=$SNAPCRAFT_PART_INSTALL/.nimble
+      mkdir -p $NIMBLE_DIR/pkgs
+
+      # Install Nimble dependencies for the current project
+      nimble install --nimbleDir:$NIMBLE_DIR -y owlkettle
+
+      # Build the application
+      nim c -d:release --out:$SNAPCRAFT_PART_INSTALL/bin/alberto src/alberto.nim
+      chmod +x $SNAPCRAFT_PART_INSTALL/bin/alberto

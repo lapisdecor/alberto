@@ -10,7 +10,7 @@ import owlkettle
 
 proc do_search(word: string): string =
 # search the word
-  echo "Searching..."
+  echo "Searching... " & word
   if word == "":
     return "Por favor escrever uma palavra."
   var definition = ""
@@ -56,7 +56,7 @@ when isMainModule:
     #wrapMode: WrapMode = WrapWord
 
   method view(app: AppState): Widget =
-    let isInActiveSearch = app.text != ""
+    #let isInActiveSearch = app.text != ""
     result = gui:
       Window():
         title = "Alberto - Dicionário Aberto"
