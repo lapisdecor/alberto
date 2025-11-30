@@ -7,7 +7,27 @@ import std/[xmlparser, xmltree]
 import std/unicode
 import owlkettle
 import std/options
+import std/strutils
 
+
+proc wordwrap(text: string): string =
+  var list_of_words = text.split(" ")
+  if list_of_words.len > 15:
+    var count = 0
+    var count2 = 0
+    while count < list_of_words.len:
+      if "\n" in list_of_words[count]:
+        count2 = 0
+      if count2 == 13:
+        list_of_words.insert("\n", count)
+      count += 1
+      count2 += 1
+  # rebuild text
+  var new_text = ""
+  for w in list_of_words:
+    new_text = new_text & w & " "
+
+  return new_text
 
 proc do_search(word: string): string =
 # search the word
@@ -38,8 +58,9 @@ proc do_search(word: string): string =
   let k = list.len() - 1
 
   for i in 0..k:
-    definition = definition & $(i+1) & ". " & list[i].innerText
+    definition = definition & "\n" & $(i+1) & ". " & list[i].innerText
 
+  definition = wordwrap(definition)
   return definition
 
 
