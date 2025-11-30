@@ -5,6 +5,11 @@ description: |
   Portuguese dictionary for the desktop.
   Dicionário de português para o desktop.
 
+platforms:
+  platform1:
+    build-on: [amd64]
+    build-for: [amd64]
+
 grade: stable
 confinement: strict
 base: core24
@@ -62,7 +67,7 @@ parts:
       mkdir -p $NIMBLE_DIR/pkgs
 
       # Install Nimble dependencies for the current project
-      #nimble install --nimbleDir:$NIMBLE_DIR -y owlkettle
+      nimble install --nimbleDir:$NIMBLE_DIR -y owlkettle
 
       # Build the application
       nim c -d:release --out:$SNAPCRAFT_PART_INSTALL/bin/alberto src/alberto.nim
