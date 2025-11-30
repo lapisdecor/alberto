@@ -6,6 +6,7 @@ import std/json
 import std/[xmlparser, xmltree]
 import std/unicode
 import owlkettle
+import std/options
 
 
 proc do_search(word: string): string =
@@ -52,6 +53,7 @@ when isMainModule:
     placeholderText: string
     buffer: TextBuffer
     monospace: bool
+    sizeRequest: tuple[x, y: int] = (-1, -1)
     text: string = ""
     #wrapMode: WrapMode = WrapWord
 
@@ -60,11 +62,12 @@ when isMainModule:
     result = gui:
       Window():
         title = "Alberto - Dicionário Aberto"
-        default_size = (600, 100)
+        default_size = (600, 400)
 
-        Box(orient = OrientY, margin = 0, spacing = 6):
-
-          Box(orient = OrientX, margin = 12, spacing = 6):
+        Grid:
+          spacing = 6
+          margin = 12
+          Box(orient = OrientX, margin = 12, spacing = 6){.x:1, y:1, hExpand: true.}:
             Label(text = "Termo")
             SearchEntry:
               text = app.text
@@ -84,15 +87,19 @@ when isMainModule:
 
 
 
-          Box(orient = OrientY, margin = 12, spacing = 6):
+          ScrolledWindow{.x:1, y:2, vExpand: true.}:
             TextView:
               buffer = app.buffer
               monospace = false
+              sizeRequest = app.sizeRequest
 
 
   let buffer = newTextBuffer()
-
-  buffer.text = ""
+  discard buffer.registerTag("marker", TagStyle(
+      background: some("#ffff77"),
+      weight: some(700)
+  ))
+  #buffer.text = ""
 
 
   brew(gui(App(buffer = buffer)))
