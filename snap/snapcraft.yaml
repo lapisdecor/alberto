@@ -58,16 +58,7 @@ parts:
     override-build: |
       set -eux
 
-      # Set up Nim path
-      export PATH=$SNAPCRAFT_STAGE/bin:$PATH
-      export NIM_LIB_PREFIX=$SNAPCRAFT_STAGE/lib
-
-      # Set the PATH so the compiler can find packages installed by nimble
-      export NIMBLE_DIR=$SNAPCRAFT_PART_INSTALL/.nimble
-      mkdir -p $NIMBLE_DIR/pkgs
-
-      # Install Nimble dependencies for the current project
-      nimble install --nimbleDir:$NIMBLE_DIR -y https://github.com/can-lehmann/owlkettle/tree/v3.0.0
+      nimble install owlkettle -y
 
       # Build the application
       nim c -d:release --out:$SNAPCRAFT_PART_INSTALL/bin/alberto src/alberto.nim
