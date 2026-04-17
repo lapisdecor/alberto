@@ -58,7 +58,7 @@ parts:
     override-build: |
       set -eux
 
-      nimble install owlkettle
+      nimble install owlkettle --verbose
 
       # Build the application
       nim c -d:release --out:$SNAPCRAFT_PART_INSTALL/bin/alberto src/alberto.nim
