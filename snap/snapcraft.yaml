@@ -23,7 +23,7 @@ apps:
 parts:
   nim-compiler:
     plugin: nil
-    source: https://github.com/nim-lang/Nim/archive/refs/tags/v2.2.6.tar.gz # Use latest version
+    source: https://github.com/nim-lang/Nim/archive/refs/tags/v2.2.8.tar.gz # Use latest version
     source-type: tar
     build-packages:
       - build-essential
