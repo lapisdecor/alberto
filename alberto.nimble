@@ -1,6 +1,6 @@
 # Package
 
-version       = "0.1.1"
+version       = "0.1.2"
 author        = "Luis Louro"
 description   = "A portuguese dictionary for the desktop"
 license       = "MIT"
@@ -10,5 +10,5 @@ bin           = @["alberto"]
 
 # Dependencies
 
-requires "nim >= 2.2.6"
+requires "nim >= 2.2.8"
 requires "owlkettle >=3.0.0"
