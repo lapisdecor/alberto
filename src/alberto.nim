@@ -5,6 +5,7 @@ import std/httpclient
 import std/json
 import std/[xmlparser, xmltree]
 import std/unicode
+import std/uri
 import owlkettle
 import std/options
 import std/strutils
@@ -29,36 +30,45 @@ proc wordwrap(text: string): string =
 
   return new_text
 
+proc validWord(word: string): bool =
+  for r in word.runes:
+    if not (r.isAlpha or r == Rune(' ') or r == Rune('-') or r == Rune('\'')):
+      return false
+  return true
+
 proc do_search(word: string): string =
-# search the word
+  # search the word
   echo "Searching... " & word
   if word == "":
     return "Por favor escrever uma palavra."
+  if not validWord(word):
+    return "Por favor escrever uma palavra válida."
+
   var definition = ""
   var response = ""
-  var client = newHttpClient()
-  var jump = false
+  var client = newHttpClient(timeout = 8000)
   try:
-    response = client.getContent("https://api.dicionario-aberto.net/word/" & toLower(word))
-    #echo response
-    if response == "[]" or response == "":
-      definition = "A palavra não está no dicionário"
-      jump = true
+    response = client.getContent("https://api.dicionario-aberto.net/word/" &
+      encodeUrl(toLower(word), usePlus = false))
+  except CatchableError as e:
+    return "Não foi possível contactar o dicionário: " & e.msg
   finally:
     client.close()
 
-  if jump:
-    return definition
+  if response == "[]" or response == "":
+    return "A palavra não está no dicionário"
 
-  let myJson = parseJson(response)
+  try:
+    let myJson = parseJson(response)
+    var myXML = myJson[0]["xml"].getStr()
+    var x = parseXml(myXML)
+    var list = x.findAll("def")
+    let k = list.len() - 1
 
-  var myXML = myJson[0]["xml"].getStr()
-  var x = parseXml(myXML)
-  var list = x.findAll("def")
-  let k = list.len() - 1
-
-  for i in 0..k:
-    definition = definition & "\n" & $(i+1) & ". " & list[i].innerText
+    for i in 0..k:
+      definition = definition & "\n" & $(i+1) & ". " & list[i].innerText
+  except CatchableError:
+    return "Não foi possível interpretar a resposta do dicionário."
 
   definition = wordwrap(definition)
   return definition
